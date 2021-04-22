@@ -65,7 +65,8 @@ def initData(filename):
             domainlist.append(Domain(name, label, length, digitNum, entropy))
 
 
-def predictData(filename, Classifier):
+predictList = []
+def predictData(filename, Classifier, output):
     with open(filename) as f:
         for line in f:
             line = line.strip()
@@ -76,11 +77,18 @@ def predictData(filename, Classifier):
             length = len(name)
             digitNum = calDigitNum(name)
             entropy = calEntropy(name)
-            res = Classifier.predict([[length, digitNum, entropy]])
-            if int(res) == 0:
-                print ("%s,notdga" % name)
+            label = Classifier.predict([[length, digitNum, entropy]])
+            if int(label) == 0:
+                # print ("%s,notdga" % name)
+                res = name + ",notdga"
             else:
-                print ("%s,dga" % name)
+                # print ("%s,dga" % name)
+                res = name + ",dga"
+            predictList.append(res)
+
+    f = open(output, "w")
+    for res in predictList:
+        f.write(res + "\n")
 
 
 def main():
@@ -96,8 +104,9 @@ def main():
     print("Begin Training...")
     clf = RandomForestClassifier(random_state=0)
     clf.fit(featureMatrix, labelList)
-    print("Begin Predicting:")
-    predictData("test.txt", clf)
+    print("Begin Predicting...")
+    predictData("test.txt", clf, "output.txt")
+    print("Prediction done.")
 
 
 
